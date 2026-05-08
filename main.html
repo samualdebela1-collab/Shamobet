@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shamo Bet - Clone</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-red: #be1e2d;
+            --dark-grey: #333;
+            --light-grey: #f4f4f4;
+            --white: #ffffff;
+            --gold: #ffcc00;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-grey);
+            padding-bottom: 70px; /* For bottom nav */
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--primary-red);
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .balance-box {
+            background: rgba(0,0,0,0.2);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .add-btn {
+            background: var(--gold);
+            color: black;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Top Navigation icons */
+        .top-nav {
+            background: white;
+            display: flex;
+            overflow-x: auto;
+            padding: 10px 5px;
+            gap: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .nav-item {
+            text-align: center;
+            min-width: 60px;
+            color: #666;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--primary-red);
+            font-weight: bold;
+        }
+
+        .nav-item i {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+
+        /* Banner */
+        .banner {
+            margin: 10px;
+            background: linear-gradient(45deg, #000428, #004e92);
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .banner h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .banner .cashback {
+            color: var(--gold);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Level Card */
+        .level-card {
+            background: #2c3e50;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 12px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .progress-container {
+            flex-grow: 1;
+        }
+
+        .progress-bar {
+            background: #555;
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        .progress-fill {
+            background: var(--gold);
+            width: 30%;
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        /* Match Card */
+        .match-card {
+            background: white;
+            margin: 10px;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .match-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .teams {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .team {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+
+        .team img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .predict-btn {
+            background: var(--primary-red);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Games Grid */
+        .section-title {
+            padding: 10px 15px;
+            font-weight: bold;
+            display: flex;
+            gap: 10px;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 0 15px;
+        }
+
+        .game-item {
+            background: #ddd;
+            aspect-ratio: 1/1;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .game-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid #eee;
+            z-index: 1000;
+        }
+
+        .b-nav-item {
+            text-align: center;
+            color: #888;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .b-nav-item.active {
+            color: var(--primary-red);
+        }
+
+        .b-nav-item i {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 2px;
+        }
+
+        /* --- አዲሱ ማስጠንቀቂያ Styling --- */
+        #depositAlertModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .alert-box {
+            background: white;
+            width: 85%;
+            max-width: 320px;
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .alert-box i { font-size: 3.5rem; color: var(--primary-red); margin-bottom: 15px; }
+        .alert-box h3 { margin-bottom: 10px; color: #333; }
+        .alert-box p { color: #666; font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px; }
+        .ok-btn {
+            background: var(--primary-red);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">
+            <img src="https://41de5f9b9b4e3d7dbd502e171b66954f.fra1.cdn.digitaloceanspaces.com/media/0f10bd8e-3ca0-4e87-aec7-fcd57d330dcd.png" alt="ShamoBet Logo">
+        </div>
+        <div class="header-icons">
+            <i class="fas fa-palette"></i>
+             <div class="balance-box">
+    <i class="fas fa-wallet"></i> 
+    <span id="userBalance">0.0</span>
+    <button class="add-btn" onclick="openDeposit()">+</button>
+</div>
+            <i class="far fa-bell"></i>
+            <i class="far fa-user-circle" style="font-size: 1.5rem;"></i>
+        </div>
+    </div>
+
+    <div class="top-nav">
+        <div class="nav-item active"><i class="fas fa-home"></i>Home</div>
+        <div class="nav-item" onclick="triggerAlert()"><i class="fas fa-trophy"></i>Sports</div>
+        <div class="nav-item" onclick="triggerAlert()"><i class="fas fa-heart"></i>Games</div>
+        <div class="nav-item" onclick="triggerAlert()"><i class="fas fa-plane"></i>Aviator</div>
+        <div class="nav-item" onclick="triggerAlert()"><i class="fas fa-bolt"></i>Fast Keno</div>
+        <div class="nav-item" onclick="triggerAlert()"><i class="fas fa-rocket"></i>JetX</div>
+    </div>
+
+    <div class="banner">
+        <h2>GET <span class="cashback">10% DAILY CASHBACK</span></h2>
+        <p>PLAY NOW!</p>
+    </div>
+
+    <div class="level-card">
+        <div style="font-size: 2rem;">🏆</div>
+        <div class="progress-container">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                <span>Level 0</span>
+                <span>3,000 pts to Starter</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+        <i class="fas fa-sync-alt"></i>
+    </div>
+
+    <div class="match-card" onclick="triggerAlert()">
+        <div class="match-header">
+            <span>Manchester United vs Liverpool</span>
+            <span style="color: var(--primary-red); font-weight: bold;">ETB 25,000</span>
+        </div>
+        <div class="teams">
+            <div class="team">
+                <img src="https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg"> 
+                VS
+                <img src="https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg">
+            </div>
+            <div style="font-size: 0.8rem; text-align: right;">
+                4d 2h 21m<br>Premier League
+            </div>
+        </div>
+        <button class="predict-btn">Predict</button>
+    </div>
+
+    <div class="section-title">
+        <span style="color: var(--primary-red);">🔥 Hot Games</span>
+        <span style="color: #888;">Most Popular in Ethiopia</span>
+    </div>
+<div class="games-grid">
+
+  <div class="game-item" onclick="triggerAlert()">
+      <img src="https://cdn-atlas-v.com/games/thumbnails/keno.jpg">
+  </div>
+
+  <div class="game-item" onclick="triggerAlert()">
+      <img src="https://d31tf22iywifl3.cloudfront.net/IFG/IFG_oa_3_coins.webp">
+  </div>
+
+  <div class="game-item" onclick="triggerAlert()">
+      <img src="https://cdn-atlas-v.com/games/thumbnails/jetx.jpg">
+  </div>
+
+  <div class="game-item" onclick="triggerAlert()">
+      <img src="https://cdn-atlas-v.com/games/thumbnails/aviator.jpg">
+  </div>
+
+  <div class="game-item" onclick="triggerAlert()">
+      <img src="https://cdn-atlas-v.com/games/thumbnails/buffalo.jpg">
+  </div>
+
+  <div class="game-item" onclick="triggerAlert()">
+      <img src="https://cdn-atlas-v.com/games/thumbnails/roulette.jpg">
+  </div>
+
+  <div class="game-item" onclick="triggerAlert()">
+      <img src="https://cdn-atlas-v.com/games/thumbnails/slots.jpg">
+  </div>
+
+  <div class="game-item" onclick="triggerAlert()">
+      <img src="https://cdn-atlas-v.com/games/thumbnails/777.jpg">
+  </div>
+
+</div>               
+    <div class="bottom-nav">
+        <div class="b-nav-item active"><i class="fas fa-home"></i>Home</div>
+        <div class="b-nav-item" onclick="triggerAlert()"><i class="fas fa-gamepad"></i>Games</div>
+        <div class="b-nav-item" onclick="triggerAlert()"><i class="fas fa-file-invoice-dollar"></i>Slip</div>
+        <div class="b-nav-item" onclick="triggerAlert()"><i class="fas fa-history"></i>Histories</div>
+        <div class="b-nav-item" onclick="triggerAlert()"><i class="fas fa-users"></i>Affiliate</div>
+    </div>
+
+    <div id="depositAlertModal">
+        <div class="alert-box">
+            <i class="fas fa-exclamation-circle"></i>
+            <h3>ማሳሰቢያ!</h3>
+            <p>ለመጫወት መጀመሪያ የተቀማጭ ገንዘብ (Deposit) ማድረግ ይኖርብዎታል።</p>
+            <button class="ok-btn" onclick="openDeposit()">እሺ (OK)</button>
+        </div>
+    </div>
+
+    <script>
+    let balance = 0;
+
+function loadBalance(){
+    balance = parseFloat(localStorage.getItem("balance")) || 0;
+    document.getElementById("userBalance").innerText = balance.toFixed(2);
+}
+
+window.onload = loadBalance;
+        const modal = document.getElementById('depositAlertModal');
+
+        // ማስጠንቀቂያውን የሚያሳይ ተግባር
+        function triggerAlert() {
+            modal.style.display = 'flex';
+        }
+
+        // "እሺ" ሲሉ ወይም Deposit በተን ሲነካ የሚሰራ
+        function openDeposit() {
+            modal.style.display = 'none';
+            window.location.href = "deposit.html"; 
+            
+        }
+
+        // ከሳጥኑ ውጭ ሲነካ እንዲዘጋ
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+
+</body>
+</html>

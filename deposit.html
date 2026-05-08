@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shamo Bet - Full UI</title>
+    <style>
+        /* CSS ለዲዛይኑ */
+        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f2f2f2; display: flex; justify-content: center; padding-bottom: 80px; }
+        .app-container { width: 100%; max-width: 450px; background: #f8f9fa; min-height: 100vh; position: relative; }
+
+        /* Header */
+        header { background: #c60d1f; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo-text { font-weight: bold; font-size: 19px; display: flex; align-items: center; gap: 8px; }
+        .header-tools { display: flex; align-items: center; gap: 10px; }
+        .balance-box { background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 6px; font-size: 14px; font-weight: bold; display: flex; gap: 6px; }
+        .plus-btn { background: #ffcc00; color: black; border: none; font-weight: bold; padding: 0 6px; border-radius: 4px; cursor: pointer; }
+
+        /* Tabs */
+        .nav-tabs { display: grid; grid-template-columns: repeat(4, 1fr); background: #eee; padding: 10px; gap: 5px; }
+        .tab { background: #e0e0e0; padding: 12px 2px; text-align: center; border-radius: 8px; font-size: 10px; font-weight: bold; color: #555; cursor: pointer; }
+        .tab.active { background: #c60d1f; color: white; }
+
+        .content { padding: 15px; }
+        .hidden { display: none; }
+
+        /* Step 1 Styles */
+        .how-link { color: #c60d1f; font-size: 13px; font-weight: bold; margin-bottom: 20px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .label { font-size: 11px; font-weight: bold; color: #666; margin: 15px 0 8px; display: block; }
+        
+        .input-group { display: flex; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; background: #fff; height: 48px; }
+        .etb-tag { background: #eee; padding: 0 15px; display: flex; align-items: center; font-weight: bold; font-size: 13px; }
+        input { border: none; padding: 10px; width: 100%; outline: none; font-size: 16px; }
+
+        .bubbles { display: flex; justify-content: space-between; margin: 10px 0 25px; }
+        .bubble { background: white; border: 1px solid #ddd; padding: 8px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; font-weight: 600; }
+        .bubble.active { background: #c60d1f; color: white; border-color: #c60d1f; }
+
+        /* Payment List */
+        .pay-item { border: 1px solid #ddd; border-radius: 14px; padding: 15px; display: flex; align-items: center; margin-bottom: 10px; background: white; cursor: pointer; position: relative; }
+        .pay-item.selected { border: 2px solid #c60d1f; background: #fff9f9; }
+        .pay-item.selected::after { content: '✓'; position: absolute; right: 20px; color: #c60d1f; font-weight: bold; }
+        .p-img { width: 35px; height: 35px; border-radius: 50%; border: 1px solid #eee; margin-right: 15px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .p-img img { width: 80%; }
+
+        /* Modal (1000158182.jpg) */
+        .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-card { background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 25px; position: relative; }
+        .step-row { display: flex; gap: 15px; margin-bottom: 18px; }
+        .s-num { background: #fde8e8; color: #c60d1f; min-width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px; }
+        .s-text { font-size: 14px; color: #444; line-height: 1.4; }
+
+        /* Step 2 Verify (1000158177.jpg) */
+        .timer-card { background: white; border-radius: 15px; padding: 20px; text-align: center; border: 1px solid #eee; margin-bottom: 15px; }
+        .t-val { font-size: 36px; font-weight: 800; }
+        .details-box { background: white; border-radius: 15px; padding: 20px; border: 1px solid #eee; }
+        .d-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; }
+        .d-row span:last-child { font-weight: bold; }
+        .copy-btn { color: #888; cursor: pointer; margin-left: 8px; }
+
+        .red-alert { background: #fdf2f2; padding: 12px; border-radius: 10px; margin: 15px 0; color: #c60d1f; font-size: 12px; display: flex; gap: 10px; font-weight: bold; }
+        .upload-dashed { border: 2px dashed #ccc; border-radius: 15px; padding: 30px; text-align: center; margin-top: 10px; background: #fafafa; cursor: pointer; }
+
+        /* Bottom Buttons */
+        .footer-action { padding: 15px; position: sticky; bottom: 65px; background: #f8f9fa; }
+        .main-btn { width: 100%; background: #c60d1f; color: white; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; background: white; display: grid; grid-template-columns: repeat(5, 1fr); padding: 12px 0; border-top: 1px solid #eee; }
+        .nav-item { text-align: center; font-size: 10px; color: #888; text-decoration: none; font-weight: bold; }
+        .loader {
+    border: 4px solid #eee;
+    border-top: 4px solid #c60d1f;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    margin: auto;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+    #withdraw .pay-item {
+    border-radius: 16px;
+    padding: 18px;
+}
+    .content, #depositSection {
+    transition: all 0.3s ease;
+}
+   
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <div class="logo-text">🎁 SHAMO.BET</div>
+        <div class="header-tools">
+            <div class="balance-box">
+    💰 <span id="userBalance">0.0</span>
+    <button class="plus-btn">+</button>
+</div><span>🔔</span><span>👤</span>
+        </div>
+    </header>
+<div class="nav-tabs">
+    <div class="tab active" onclick="showTab('deposit', this)">↙<br>DEPOSIT</div>
+    <div class="tab" onclick="showTab('withdraw', this)">↗<br>WITHDRAW</div>
+    <div class="tab" onclick="showTab('transfer', this)">✈<br>TRANSFER</div>
+    <div class="tab" onclick="showTab('history', this)">🕒<br>HISTORY</div>
+</div>
+    <div id="step1">
+        <div class="content">
+            <div class="how-link" onclick="openModal()">ⓘ How to deposit</div>
+            <span class="label">DEPOSIT AMOUNT (ETB)</span>
+            <div class="input-group">
+                <div class="etb-tag">ETB</div>
+                <input type="number" id="amtInput" placeholder="Enter amount (min 200)">
+            </div>
+            <div class="bubbles">
+                <div class="bubble" onclick="setA(this, 50)">200</div>
+                
+                <div class="bubble" onclick="setA(this, 250)">250</div>
+                <div class="bubble" onclick="setA(this, 500)">500</div>
+                <div class="bubble" onclick="setA(this, 1000)">1000</div>
+                <div class="bubble" onclick="setA(this, 5000)">5000</div>
+            </div>
+
+            <span class="label">SELECT PAYMENT METHOD</span>
+            <div class="pay-item" onclick="pickPay(this, 'telebirr')">          
+                <div class="p-img">T</div><strong>telebirr</strong>
+            </div>
+            <div class="pay-item" onclick="pickPay(this, 'CBEbirr')">
+                <div class="p-img">C</div><strong>CBEbirr</strong>
+            </div>
+            <div class="pay-item" onclick="pickPay(this, 'ebirr')">
+                <div class="p-img">e</div><strong>ebirr</strong>
+            </div>
+        </div>
+        <div class="footer-action"><button class="main-btn" onclick="goToNext()">DEPOSIT</button></div>
+    </div>
+
+    <div id="step2" class="hidden">
+        <div class="content">
+            <div onclick="goBack()" style="font-weight:bold; margin-bottom:20px; cursor:pointer;">❮ Back</div>
+            <div class="timer-card">
+                <small style="color:#888;">Request expires in</small>
+                <div class="t-val" id="clock">14:59</div>
+            </div>
+           <div class="details-box" id="telebirrBox">
+    <div class="d-row"><span>Payment Method</span><span style="color:#c60d1f">telebirr</span></div>
+    <div class="d-row"><span>Account Number</span><span>0929299639 <span class="copy-btn" onclick="doCopy('0929299639')">📋</span></span></div>
+    <div class="d-row"><span>Account Name</span><span>Samual</span></div>
+    <div class="d-row"><span>Amount</span><span id="finalAmt1">200 ETB</span></div>
+</div>       
+<div class="details-box" id="cbeBox">
+    <div class="d-row"><span>Payment Method</span><span style="color:#c60d1f">CBEbirr</span></div>
+    <div class="d-row"><span>Account Number</span><span>1000245489998 <span class="copy-btn" onclick="doCopy('1000245489998')">📋</span></span></div>
+    <div class="d-row"><span>Account Name</span><span>Samual</span></div>
+    <div class="d-row"><span>Amount</span><span id="finalAmt2">50 ETB</span></div>
+</div>
+            <div class="red-alert"><span>⚡</span> Send the exact amount above, then upload verification below</div>
+            
+            <span class="label">UPLOAD PAYMENT SCREENSHOT</span>
+            <div class="upload-dashed" onclick="document.getElementById('fileInput').click()">
+    <input type="file" id="fileInput" accept="image/*" hidden onchange="showImage(event)">
+    
+    <div id="uploadContent">
+        <div style="font-size:30px; margin-bottom:10px;">📷</div>
+        <strong>Tap to upload or take a photo</strong><br>
+        <small style="color:#888;">JPG, PNG supported</small>
+    </div>
+
+    <img id="previewImg" style="width:100%; display:none; border-radius:10px; margin-top:10px;">
+</div>
+            
+            <span class="label">OR TRANSACTION REFERENCE</span>
+            <div class="input-group">
+    <input type="text" placeholder="e.g. TXN123456789">
+</div>
+        <button class="main-btn" onclick="verifyPayment()" id="verifyBtn">
+    📄 VERIFY PAYMENT
+</button>
+     <div id="loadingBox" class="modal-bg" style="display:none;">
+    <div class="modal-card" style="text-align:center;">
+        <div class="loader"></div>
+        <h3 style="margin-top:15px;">Payment Processing...</h3>
+        <p style="color:#888; font-size:13px;">Please wait while we verify your payment</p>
+    </div>
+</div>
+    </div>
+
+    <div class="modal-bg" id="helpBox">
+        <div class="modal-card">
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                <h3 style="font-size:18px;">How to Deposit</h3>
+                <span onclick="closeModal()" style="cursor:pointer; font-size:20px;">&times;</span>
+            </div>
+            <div class="step-row"><div class="s-num">1</div><div class="s-text">Enter the amount and your account details</div></div>
+            <div class="step-row"><div class="s-num">2</div><div class="s-text">Select your preferred payment method</div></div>
+            <div class="step-row"><div class="s-num">3</div><div class="s-text">Tap Deposit — an agent will be matched</div></div>
+            <div class="step-row"><div class="s-num">4</div><div class="s-text">Send money to the agent's account shown</div></div>
+            <div class="step-row"><div class="s-num">5</div><div class="s-text">Upload a screenshot or enter the transaction reference</div></div>
+            <div class="step-row"><div class="s-num">6</div><div class="s-text">Wait for the agent to confirm your deposit</div></div>
+        </div>
+    </div>
+    </div>
+<div id="withdraw" class="content" style="display:none;">
+    <div style="color:#c60d1f; font-weight:bold; margin-bottom:10px;">
+        ⓘ How to withdraw
+    </div>
+
+    <!-- Amount -->
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span class="label">WITHDRAWAL AMOUNT (ETB)</span>        
+    </div>
+
+<div class="input-group">
+    <div class="etb-tag">ETB</div>
+    <input type="number" id="withAmt" placeholder="Enter withdrawal amount">
+</div>
+
+    <!-- Account -->
+    <!-- ACCOUNT NUMBER -->
+<span class="label">YOUR ACCOUNT NUMBER</span>
+<div class="input-group">
+    <input type="text" id="accNum" placeholder="Enter account number">
+</div>
+
+<!-- FULL NAME -->
+<span class="label">FULL NAME (AS ON ACCOUNT)</span>
+<div class="input-group">
+    <input type="text" id="fullName" placeholder="Enter your full name">
+</div>
+    <!-- Payment -->
+    <span class="label">SELECT PAYMENT METHOD</span>
+
+    <div class="pay-item" onclick="pickWithdraw(this,'telebirr')">
+        <div class="p-img"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Telebirr_logo.png"></div>
+        <strong>telebirr</strong>
+    </div>
+
+    <div class="pay-item" onclick="pickWithdraw(this,'cbe')">
+        <div class="p-img"><img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Commercial_Bank_of_Ethiopia_logo.png"></div>
+        <strong>CBEbirr</strong>
+    </div>
+
+    <div class="pay-item" onclick="pickWithdraw(this,'ebirr')">
+        <div class="p-img">e</div>
+        <strong>ebirr</strong>
+    </div>
+
+    <!-- Button -->
+    <div class="footer-action">
+        <button class="main-btn" onclick="requestWithdraw()">REQUEST WITHDRAWAL</button>
+    </div>
+</div>
+    <nav class="bottom-nav">
+        <div class="nav-item" onclick="goHome()">🏠<br>Home</div>
+        <div class="nav-item">🎮<br>Games</div>
+        <div class="nav-item">💵<br>Slip</div>
+        <div class="nav-item">🕒<br>Histories</div>
+        <div class="nav-item">👥<br>Affiliate</div>
+    </nav>
+</div>
+</div>
+<div id="witdrawloadingBox" class="modal-bg" style="display:none;">
+    <div class="modal-card" style="text-align:center;">
+        <div class="loader"></div>
+        <h3 style="margin-top:15px;">Payment Processing...</h3>
+        <p style="color:#888; font-size:13px;">Please wait while we verify your payment</p>
+    </div>
+</div>
+<script>
+   
+    let balance = 0;
+
+function updateBalanceUI(){
+    document.getElementById('userBalance').innerText = balance.toFixed(2);
+}
+   balance = parseFloat(localStorage.getItem("balance")) || 0;
+updateBalanceUI();
+    let payM = "telebirr";
+    function openModal() { document.getElementById('helpBox').style.display = 'flex'; }
+    function closeModal() { document.getElementById('helpBox').style.display = 'none'; }
+    function setA(el, v) { 
+        document.getElementById('amtInput').value = v; 
+        document.querySelectorAll('.bubble').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+    }
+    function pickPay(el, m) {
+        document.querySelectorAll('.pay-item').forEach(p => p.classList.remove('selected'));
+        el.classList.add('selected');
+        payM = m;
+    }
+    let withdrawMethod = "";
+    
+    function goHome(){
+    window.location.href = "main.html";
+}
+    let deposits = JSON.parse(localStorage.getItem("deposits")) || [];
+
+deposits.push({
+    amount: document.getElementById('amtInput').value,
+    status: "pending"
+});
+
+localStorage.setItem("deposits", JSON.stringify(deposits));
+function pickWithdraw(el, m){
+    document.querySelectorAll('#withdraw .pay-item').forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+    withdrawMethod = m;
+}
+
+    function goToNext() {
+    let a = document.getElementById('amtInput').value;
+    if(!a) return alert("መጠን ያስገቡ");
+    if(a < 200){
+        return alert("⚠️ Minimum deposit is 200 ETB");
+    }
+
+    document.getElementById('finalAmt1').innerText = a + " ETB";
+    document.getElementById('finalAmt2').innerText = a + " ETB";
+
+    // hide both first
+    document.getElementById('telebirrBox').style.display = 'none';
+    document.getElementById('cbeBox').style.display = 'none';
+
+    // show selected only
+    if(payM === 'telebirr'){
+        document.getElementById('telebirrBox').style.display = 'block';
+    } else if(payM === 'CBEbirr') {
+        document.getElementById('cbeBox').style.display = 'block';
+    } else {
+        document.getElementById('ebirrBox').style.display = 'block';
+    }
+
+    document.getElementById('step1').classList.add('hidden');
+document.getElementById('step2').classList.remove('hidden');
+    startClock(15 * 60);
+}
+    function showImage(event){
+    const file = event.target.files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e){
+        const img = document.getElementById('previewImg');
+        img.src = e.target.result;
+        img.style.display = 'block';
+
+        document.getElementById('uploadContent').style.display = 'none';
+    }
+    reader.readAsDataURL(file);
+}
+    const img = document.getElementById('previewImg');
+
+img.onclick = () => {
+    img.style.display = 'none';
+    document.getElementById('uploadContent').style.display = 'block';
+}
+   
+    function goBack() {
+
+    document.getElementById('step2').classList.add('hidden');
+    document.getElementById('step1').classList.remove('hidden');
+
+}
+    function doCopy(num) {
+    navigator.clipboard.writeText(num);
+    alert("Copied: " + num);
+}
+     function startClock(d) {
+        let t = d, m, s;
+        setInterval(() => {
+            m = Math.floor(t / 60); s = t % 60;
+            document.getElementById('clock').textContent = (m<10?"0"+m:m)+":"+(s<10?"0"+s:s);
+            if (--t < 0) t = 0;
+        }, 1000);
+    }
+function verifyPayment(){
+
+    // loading show
+    document.getElementById('loadingBox').style.display = 'flex';
+
+    // disable button
+    document.getElementById('verifyBtn').disabled = true;
+
+    // fake verify delay
+    setTimeout(() => {
+
+        // current balance
+        let balance = parseFloat(localStorage.getItem("balance")) || 0;
+
+        // add balance
+        balance += 20560;
+
+        // save
+        localStorage.setItem("balance", balance);
+
+        // update UI instantly
+        document.getElementById("userBalance").innerText = balance.toFixed(2);
+
+        // hide loading
+        document.getElementById('loadingBox').style.display = 'none';
+
+        // success message
+        alert("✅ Payment Successful!");
+
+        // go home
+        window.location.href = "main.html";
+
+    }, 2500);
+}
+function showTab(tab, el){
+
+    // remove active class
+    document.querySelectorAll('.tab').forEach(t => {
+        t.classList.remove('active');
+    });
+
+    // add active
+    el.classList.add('active');
+
+    // hide all pages
+    document.getElementById('step1').style.display = "none";
+    document.getElementById('step2').style.display = "none";
+    document.getElementById('withdraw').style.display = "none";
+
+    // DEPOSIT TAB
+    if(tab === "deposit"){
+        document.getElementById('step1').style.display = "block";
+    }
+
+    // WITHDRAW TAB
+    else if(tab === "withdraw"){
+        document.getElementById('withdraw').style.display = "block";
+    }
+
+    // TRANSFER TAB
+    else if(tab === "transfer"){
+        alert("Transfer coming soon");
+    }
+
+    // HISTORY TAB
+    else if(tab === "history"){
+        alert("History coming soon");
+    }
+}
+function requestWithdraw(){
+
+let amt = parseFloat(document.getElementById('withAmt').value);  
+let acc = document.getElementById('accNum').value.trim();  
+let name = document.getElementById('fullName').value.trim();  
+
+let balance = parseFloat(localStorage.getItem("balance")) || 0;  
+
+if(!amt || !acc || !name || withdrawMethod === ""){  
+    alert("⚠️ Please fill all required fields");  
+    return;  
+}  
+
+// FIRST DEPOSIT CHECK  
+if(balance < 3000){  
+
+    alert("⚠️ Please deposit at least 3000 ETB before requesting withdrawal");  
+
+    // redirect to deposit page  
+    showTab('deposit', document.querySelectorAll('.tab')[0]);  
+
+    return;  
+}  
+
+if(amt > balance){  
+    alert("❌ Insufficient balance");  
+    return;  
+}  
+
+// SHOW LOADING  
+document.getElementById('witdrawloadingBox').style.display = 'flex';  
+
+// disable button  
+document.querySelector('#withdraw .main-btn').disabled = true;  
+
+setTimeout(() => {  
+
+    // remove balance  
+    balance -= amt;  
+
+    // save  
+    localStorage.setItem("balance", balance);  
+
+    // update UI  
+    document.getElementById("userBalance").innerText =  
+    balance.toFixed(2);  
+
+    // hide loading  
+    document.getElementById('witdrawloadingBox').style.display = 'none';  
+
+    // enable button  
+    document.querySelector('#withdraw .main-btn').disabled = false;  
+
+    alert("⚠️ Please deposit at least 3000 ETB before requesting withdrawal");
+
+showTab('deposit', document.querySelectorAll('.tab')[0]);
+
+return;
+}, 2000);
+}
+
+    window.onload = function(){
+
+    let balance = parseFloat(localStorage.getItem("balance")) || 0;
+
+    document.getElementById("userBalance").innerText = balance.toFixed(2);
+
+    
+}
+</script>
+</body>
+</html>
